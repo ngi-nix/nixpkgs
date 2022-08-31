@@ -15939,6 +15939,8 @@ with pkgs;
 
   confluent-platform = callPackage ../servers/confluent-platform {};
 
+  corteza = callPackage ../servers/corteza { };
+
   ctags = callPackage ../development/tools/misc/ctags { };
 
   ctagsWrapped = callPackage ../development/tools/misc/ctags/wrapped.nix {};
