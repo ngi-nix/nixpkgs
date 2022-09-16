@@ -72,9 +72,6 @@ in
   };
 
   config =
-    let
-      localPostgres = (cfg.settings.database.host == "localhost" || cfg.settings.database.host == "/run/postgresql");
-    in
     lib.mkIf cfg.enable {
       services.lemmy.settings = (mapAttrs (name: mkDefault)
         {
@@ -101,7 +98,7 @@ in
         };
       });
 
-      services.postgresql = mkIf localPostgres {
+      services.postgresql = mkIf cfg.settings.database.createLocally {
         enable = mkDefault true;
       };
 
@@ -142,7 +139,7 @@ in
       };
 
       assertions = [{
-        assertion = cfg.settings.database.createLocally -> localPostgres;
+        assertion = cfg.settings.database.createLocally -> cfg.settings.database.host == "localhost" || cfg.settings.database.host == "/run/postgresql";
         message = "if you want to create the database locally, you need to use a local database";
       }];
 
