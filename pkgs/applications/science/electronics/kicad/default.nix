@@ -12,6 +12,7 @@
 , librsvg
 , cups
 , kicad  # for self-reference below <<<
+, runCommand
 
 , pname ? "kicad"
 , stable ? true
@@ -113,12 +114,18 @@ in
 stdenv.mkDerivation rec  {
   # TODO: figure out what we should call this. plugins is definitely not the
   # right word. is there a better word than "3rdparty"
-  passthru.withPlugins = plugins: (
+  passthru.withPlugins = plugins:
+  let
+    pluginsDrv  = symlinkJoin {
+      name = "plugins";
+      paths = plugins;
+    };
+  in (
     runCommand "kicad-with-plugins" {} ''
       mkdir -p $out/bin/
       # TODO: Other stuff in bin dir, look at it later
-      makeWrapper "${kicad}/bin/kicad" "$out/bin/kicad" --set KICAD7_3RD_PARTY
-    '';
+      makeWrapper "${kicad}/bin/kicad" "$out/bin/kicad" --set KICAD7_3RD_PARTY ${pluginsDrv}
+    ''
   );
 
   # Common libraries, referenced during runtime, via the wrapper.
