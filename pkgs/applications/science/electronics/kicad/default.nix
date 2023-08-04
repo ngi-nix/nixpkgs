@@ -114,8 +114,10 @@ stdenv.mkDerivation rec  {
   # TODO: figure out what we should call this. plugins is definitely not the
   # right word. is there a better word than "3rdparty"
   passthru.withPlugins = plugins: (
-    #kicad
-    42
+    runCommand "kicad-with-plugins" {} ''
+      mkdir -p $out/bin/
+      makeWrapper "${vscode}/bin/${executableName}" "$out/bin/${executableName}" ${extensionsFlag}
+    '';
   );
 
   # Common libraries, referenced during runtime, via the wrapper.
