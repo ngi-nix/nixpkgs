@@ -110,6 +110,9 @@ let
   inherit (lib) concatStringsSep flatten optionalString optionals;
 in
 stdenv.mkDerivation rec {
+  withPackages = plugins: (
+    42
+  );
 
   # Common libraries, referenced during runtime, via the wrapper.
   passthru.libraries = callPackages ./libraries.nix { inherit libSrc; };
