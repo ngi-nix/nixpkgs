@@ -112,7 +112,8 @@ let
 in
 stdenv.mkDerivation rec {
   withPackages = plugins: (
-    kicad
+    #kicad
+    42
   );
 
   # Common libraries, referenced during runtime, via the wrapper.
