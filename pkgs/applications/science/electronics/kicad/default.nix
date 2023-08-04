@@ -111,7 +111,9 @@ let
   inherit (lib) concatStringsSep flatten optionalString optionals;
 in
 stdenv.mkDerivation rec  {
-  passthru.withPackages = plugins: (
+  # TODO: figure out what we should call this. plugins is definitely not the
+  # right word. is there a better word than "3rdparty"
+  passthru.withPlugins = plugins: (
     #kicad
     42
   );
