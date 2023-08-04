@@ -116,7 +116,8 @@ stdenv.mkDerivation rec  {
   passthru.withPlugins = plugins: (
     runCommand "kicad-with-plugins" {} ''
       mkdir -p $out/bin/
-      makeWrapper "${vscode}/bin/${executableName}" "$out/bin/${executableName}" ${extensionsFlag}
+      # TODO: Other stuff in bin dir, look at it later
+      makeWrapper "${kicad}/bin/kicad" "$out/bin/kicad" --set KICAD7_3RD_PARTY
     '';
   );
 
