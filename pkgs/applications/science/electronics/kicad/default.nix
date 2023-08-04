@@ -110,8 +110,8 @@ let
 
   inherit (lib) concatStringsSep flatten optionalString optionals;
 in
-stdenv.mkDerivation rec {
-  withPackages = plugins: (
+stdenv.mkDerivation rec  {
+  passthru.withPackages = plugins: (
     #kicad
     42
   );
