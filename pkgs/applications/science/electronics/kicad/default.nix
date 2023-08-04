@@ -11,6 +11,7 @@
 , callPackages
 , librsvg
 , cups
+, kicad  # for self-reference below <<<
 
 , pname ? "kicad"
 , stable ? true
@@ -111,7 +112,7 @@ let
 in
 stdenv.mkDerivation rec {
   withPackages = plugins: (
-    42
+    kicad
   );
 
   # Common libraries, referenced during runtime, via the wrapper.
