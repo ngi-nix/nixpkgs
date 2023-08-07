@@ -131,9 +131,15 @@ stdenv.mkDerivation rec  {
     } ''
       mkdir -p $out/bin/
       # TODO: Other stuff in bin dir, look at it later
+
+      echo "Before: $PYTHONPATH"
+      ${plugins.
+      buildPythonPath ${plugin}
+      echo "After: $PYTHONPATH"
+
       makeWrapper "${kicadWithPythonPkgs}/bin/kicad" "$out/bin/kicad" \
         --set KICAD7_3RD_PARTY ${pluginsDrv}/share/kicad/7.0/3rdparty \
-        --set PYTHONPATH_EXTRA
+        --set PYTHONPATH_EXTRA ${pluginsDrv}/lib/python3.10/site-packages
     ''
   );
 
