@@ -27,6 +27,7 @@
 , withI18n ? true
 , srcs ? { }
 , symlinkJoin
+, extraPythonPackages ? []
 }:
 
 # The `srcs` parameter can be used to override the kicad source code
@@ -120,13 +121,18 @@ stdenv.mkDerivation rec  {
       name = "plugins";
       paths = plugins;
     };
+    kicadWithPythonPkgs = kicad;
+    #<<< kicadWithPythonPkgs = kicad.override {
+    #<<<   extraPythonPackages = plugins;
+    #<<< };
   in (
     runCommand "kicad-with-plugins" {
       nativeBuildInputs = [ makeWrapper ];
     } ''
       mkdir -p $out/bin/
       # TODO: Other stuff in bin dir, look at it later
-      makeWrapper "${kicad}/bin/kicad" "$out/bin/kicad" --set KICAD7_3RD_PARTY ${pluginsDrv}/share/kicad/7.0/3rdparty
+      export PYTHONPATH=jfly-demo-i-do-not-think-this-matters-at-all
+      makeWrapper "${kicadWithPythonPkgs}/bin/kicad" "$out/bin/kicad" --set KICAD7_3RD_PARTY ${pluginsDrv}/share/kicad/7.0/3rdparty
     ''
   );
 
@@ -150,7 +156,7 @@ stdenv.mkDerivation rec  {
   dontFixup = true;
 
   pythonPath = optionals (withScripting)
-    [ wxPython python.pkgs.six python.pkgs.requests ];
+    [ wxPython python.pkgs.six python.pkgs.requests ] ++ extraPythonPackages;
 
   nativeBuildInputs = [ makeWrapper ]
     ++ optionals (withScripting)
