@@ -127,7 +127,7 @@ stdenv.mkDerivation rec  {
     #<<< };
   in (
     runCommand "kicad-with-plugins" {
-      nativeBuildInputs = [ makeWrapper ];
+      nativeBuildInputs = [ makeWrapper python.pkgs.wrapPython ];
     } ''
       mkdir -p $out/bin/
       # TODO: Other stuff in bin dir, look at it later
