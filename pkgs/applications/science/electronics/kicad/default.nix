@@ -116,12 +116,14 @@ stdenv.mkDerivation rec  {
   # right word. is there a better word than "3rdparty"
   passthru.withPlugins = plugins:
   let
-    pluginsDrv  = symlinkJoin {
+    pluginsDrv = symlinkJoin {
       name = "plugins";
       paths = plugins;
     };
   in (
-    runCommand "kicad-with-plugins" {} ''
+    runCommand "kicad-with-plugins" {
+      nativeBuildInputs = [ makeWrapper ];
+    } ''
       mkdir -p $out/bin/
       # TODO: Other stuff in bin dir, look at it later
       makeWrapper "${kicad}/bin/kicad" "$out/bin/kicad" --set KICAD7_3RD_PARTY ${pluginsDrv}
