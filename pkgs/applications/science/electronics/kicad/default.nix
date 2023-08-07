@@ -135,6 +135,7 @@ stdenv.mkDerivation rec  {
       echo "Before: $PYTHONPATH"
       buildPythonPath ${lib.last plugins}
       echo "After: $PYTHONPATH"
+      exit 1
 
       makeWrapper "${kicadWithPythonPkgs}/bin/kicad" "$out/bin/kicad" \
         --set KICAD7_3RD_PARTY ${pluginsDrv}/share/kicad/7.0/3rdparty \
