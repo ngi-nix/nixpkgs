@@ -126,7 +126,7 @@ stdenv.mkDerivation rec  {
     } ''
       mkdir -p $out/bin/
       # TODO: Other stuff in bin dir, look at it later
-      makeWrapper "${kicad}/bin/kicad" "$out/bin/kicad" --set KICAD7_3RD_PARTY ${pluginsDrv}
+      makeWrapper "${kicad}/bin/kicad" "$out/bin/kicad" --set KICAD7_3RD_PARTY ${pluginsDrv}/share/kicad/7.0/3rdparty
     ''
   );
 
