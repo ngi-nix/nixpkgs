@@ -131,8 +131,9 @@ stdenv.mkDerivation rec  {
     } ''
       mkdir -p $out/bin/
       # TODO: Other stuff in bin dir, look at it later
-      export PYTHONPATH=jfly-demo-i-do-not-think-this-matters-at-all
-      makeWrapper "${kicadWithPythonPkgs}/bin/kicad" "$out/bin/kicad" --set KICAD7_3RD_PARTY ${pluginsDrv}/share/kicad/7.0/3rdparty
+      makeWrapper "${kicadWithPythonPkgs}/bin/kicad" "$out/bin/kicad" \
+        --set KICAD7_3RD_PARTY ${pluginsDrv}/share/kicad/7.0/3rdparty \
+        --set PYTHONPATH jfly-demo-i-do-not-think-this-matters-at-all
     ''
   );
 
