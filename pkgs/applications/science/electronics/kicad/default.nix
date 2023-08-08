@@ -168,7 +168,7 @@ stdenv.mkDerivation rec {
     "--set-default KICAD7_FOOTPRINT_DIR ${footprints}/share/kicad/footprints"
     "--set-default KICAD7_SYMBOL_DIR ${symbols}/share/kicad/symbols"
     "--set-default KICAD7_TEMPLATE_DIR ${template_dir}"
-    "--set-default KICAD7_3RD_PARTY ${thirdPartyPackagesJoined}/share/kicad/7.0/3rdparty"
+    "--set-default KICAD7_3RD_PARTY ${thirdPartyPackagesJoined}/share/kicad/${version}/3rdparty"
   ]
   ++ optionals (with3d)
   [
