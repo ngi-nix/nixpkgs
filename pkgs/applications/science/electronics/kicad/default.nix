@@ -11,8 +11,6 @@
 , callPackages
 , librsvg
 , cups
-, kicad  # for self-reference below <<<
-, runCommand
 
 , pname ? "kicad"
 , stable ? true
@@ -28,7 +26,6 @@
 , withI18n ? true
 , srcs ? { }
 , symlinkJoin
-, extraPythonPackages ? []
 }:
 
 # The `srcs` parameter can be used to override the kicad source code
@@ -111,35 +108,14 @@ let
   python = python3;
   wxPython = python.pkgs.wxPython_4_2;
 
+  thirdPartyPackagesJoined = symlinkJoin {
+    name = "third-party-packages";
+    paths = thirdPartyPackages;
+  };
+
   inherit (lib) concatStringsSep flatten optionalString optionals;
 in
-stdenv.mkDerivation rec  {
-  # TODO: figure out what we should call this. plugins is definitely not the
-  # right word. is there a better word than "3rdparty"
-  passthru.withPlugins = plugins:
-  let
-    pluginsDrv = symlinkJoin {
-      name = "plugins";
-      paths = plugins;
-    };
-    kicadWithPythonPkgs = kicad.override {
-      extraPythonPackages = plugins;
-      withScripting = true;
-    };
-  in (
-    runCommand "kicad-with-plugins" {
-      nativeBuildInputs = [ makeWrapper python.pkgs.wrapPython ];
-    } ''
-      mkdir -p $out/bin/
-      # TODO: Other stuff in bin dir, look at it later
-
-      buildPythonPath ${lib.last plugins}
-
-      makeWrapper "${kicadWithPythonPkgs}/bin/kicad" "$out/bin/kicad" \
-        --set KICAD7_3RD_PARTY ${pluginsDrv}/share/kicad/7.0/3rdparty
-    ''
-  );
-
+stdenv.mkDerivation rec {
   # Common libraries, referenced during runtime, via the wrapper.
   passthru.libraries = callPackages ./libraries.nix { inherit libSrc; };
   base = callPackage ./base.nix {
@@ -160,7 +136,7 @@ stdenv.mkDerivation rec  {
   dontFixup = true;
 
   pythonPath = optionals (withScripting)
-    [ wxPython python.pkgs.six python.pkgs.requests ] ++ extraPythonPackages;
+    [ wxPython python.pkgs.six python.pkgs.requests ] ++ thirdPartyPackages;
 
   nativeBuildInputs = [ makeWrapper ]
     ++ optionals (withScripting)
@@ -192,6 +168,7 @@ stdenv.mkDerivation rec  {
     "--set-default KICAD7_FOOTPRINT_DIR ${footprints}/share/kicad/footprints"
     "--set-default KICAD7_SYMBOL_DIR ${symbols}/share/kicad/symbols"
     "--set-default KICAD7_TEMPLATE_DIR ${template_dir}"
+    "--set-default KICAD7_3RD_PARTY ${thirdPartyPackagesJoined}/share/kicad/7.0/3rdparty"
   ]
   ++ optionals (with3d)
   [
