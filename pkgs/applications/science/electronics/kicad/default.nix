@@ -132,9 +132,11 @@ stdenv.mkDerivation rec  {
       mkdir -p $out/bin/
       # TODO: Other stuff in bin dir, look at it later
 
-      echo "Before: $PYTHONPATH"
+      echo "Before:  $program_PYTHONPATH"
+      echo "Before path: $program_PATH"
       buildPythonPath ${lib.last plugins}
-      echo "After: $PYTHONPATH"
+      echo "After:  $program_PYTHONPATH"
+      echo "Before path: $program_PATH"
       exit 1
 
       makeWrapper "${kicadWithPythonPkgs}/bin/kicad" "$out/bin/kicad" \
