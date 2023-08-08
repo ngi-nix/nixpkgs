@@ -121,10 +121,9 @@ stdenv.mkDerivation rec  {
       name = "plugins";
       paths = plugins;
     };
-    kicadWithPythonPkgs = kicad;
-    #<<< kicadWithPythonPkgs = kicad.override {
-    #<<<   extraPythonPackages = plugins;
-    #<<< };
+    kicadWithPythonPkgs = kicad.override {
+      extraPythonPackages = plugins;
+    };
   in (
     runCommand "kicad-with-plugins" {
       nativeBuildInputs = [ makeWrapper python.pkgs.wrapPython ];
@@ -135,8 +134,7 @@ stdenv.mkDerivation rec  {
       buildPythonPath ${lib.last plugins}
 
       makeWrapper "${kicadWithPythonPkgs}/bin/kicad" "$out/bin/kicad" \
-        --set KICAD7_3RD_PARTY ${pluginsDrv}/share/kicad/7.0/3rdparty \
-        --set KICAD_PYTHONPATH_EXTRA $program_PYTHONPATH
+        --set KICAD7_3RD_PARTY ${pluginsDrv}/share/kicad/7.0/3rdparty
     ''
   );
 
@@ -220,7 +218,7 @@ stdenv.mkDerivation rec  {
         # wrap each of the directly usable tools
         (map
           (tool: "makeWrapper ${base}/${bin}/${tool} $out/bin/${tool} $makeWrapperArgs"
-            + optionalString (withScripting) " --set PYTHONPATH \"$program_PYTHONPATH:\\$KICAD_PYTHONPATH_EXTRA\""
+            + optionalString (withScripting) " --set PYTHONPATH \"$program_PYTHONPATH\""
           )
           tools)
 
