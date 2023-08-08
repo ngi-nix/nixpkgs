@@ -220,7 +220,7 @@ stdenv.mkDerivation rec  {
         # wrap each of the directly usable tools
         (map
           (tool: "makeWrapper ${base}/${bin}/${tool} $out/bin/${tool} $makeWrapperArgs"
-            + optionalString (withScripting) " --set PYTHONPATH \"$program_PYTHONPATH:\$KICAD_PYTHONPATH_EXTRA\""
+            + optionalString (withScripting) " --set PYTHONPATH \"$program_PYTHONPATH:\\$KICAD_PYTHONPATH_EXTRA\""
           )
           tools)
 
