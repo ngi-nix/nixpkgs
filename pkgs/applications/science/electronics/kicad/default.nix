@@ -132,16 +132,11 @@ stdenv.mkDerivation rec  {
       mkdir -p $out/bin/
       # TODO: Other stuff in bin dir, look at it later
 
-      echo "Before:  $program_PYTHONPATH"
-      echo "Before path: $program_PATH"
       buildPythonPath ${lib.last plugins}
-      echo "After:  $program_PYTHONPATH"
-      echo "Before path: $program_PATH"
-      exit 1
 
       makeWrapper "${kicadWithPythonPkgs}/bin/kicad" "$out/bin/kicad" \
         --set KICAD7_3RD_PARTY ${pluginsDrv}/share/kicad/7.0/3rdparty \
-        --set PYTHONPATH_EXTRA ${pluginsDrv}/lib/python3.10/site-packages
+        --set KICAD_PYTHONPATH_EXTRA $program_PYTHONPATH
     ''
   );
 
@@ -225,7 +220,7 @@ stdenv.mkDerivation rec  {
         # wrap each of the directly usable tools
         (map
           (tool: "makeWrapper ${base}/${bin}/${tool} $out/bin/${tool} $makeWrapperArgs"
-            + optionalString (withScripting) " --set PYTHONPATH \"$program_PYTHONPATH\""
+            + optionalString (withScripting) " --set PYTHONPATH \"$program_PYTHONPATH:$KICAD_PYTHONPATH_EXTRA\""
           )
           tools)
 
