@@ -20,6 +20,7 @@
 , libngspice
 , withScripting ? true
 , python3
+, thirdPartyPackages ? []
 , debug ? false
 , sanitizeAddress ? false
 , sanitizeThreads ? false
