@@ -123,6 +123,7 @@ stdenv.mkDerivation rec  {
     };
     kicadWithPythonPkgs = kicad.override {
       extraPythonPackages = plugins;
+      withScripting = true;
     };
   in (
     runCommand "kicad-with-plugins" {
