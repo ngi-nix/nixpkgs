@@ -5678,6 +5678,8 @@ self: super: with self; {
     python3 = python;
   }).src;
 
+  kikit = callPackage ../development/python-modules/kikit { };
+
   kinparse = callPackage ../development/python-modules/kinparse { };
 
   kiss-headers = callPackage ../development/python-modules/kiss-headers { };
