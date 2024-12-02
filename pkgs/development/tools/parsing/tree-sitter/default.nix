@@ -60,6 +60,7 @@ let
           src = grammar.src or (fetchGrammar grammar);
           location = grammar.location or null;
           generate = grammar.generate or false;
+          isBroken = builtins.hasAttr "isBroken" grammar && grammar.isBroken || false;
         };
       grammars' = import ./grammars { inherit lib; } // extraGrammars;
       grammars = grammars' //
@@ -70,7 +71,11 @@ let
         { tree-sitter-typescript = grammars'.tree-sitter-typescript // { location = "typescript"; }; } //
         { tree-sitter-tsx = grammars'.tree-sitter-typescript // { location = "tsx"; }; } //
         { tree-sitter-markdown = grammars'.tree-sitter-markdown // { location = "tree-sitter-markdown"; }; } //
-        { tree-sitter-markdown-inline = grammars'.tree-sitter-markdown // { language = "tree-sitter-markdown_inline"; location = "tree-sitter-markdown-inline"; }; } //
+        { tree-sitter-markdown-inline = grammars'.tree-sitter-markdown // {
+          language = "tree-sitter-markdown_inline";
+          location = "tree-sitter-markdown-inline";
+          # Since locations are not passed to the update script we can manually set it here
+          isBroken = true; }; } //
         { tree-sitter-php = grammars'.tree-sitter-php // { location = "php"; }; } //
         { tree-sitter-sql = grammars'.tree-sitter-sql // { generate = true; }; };
     in

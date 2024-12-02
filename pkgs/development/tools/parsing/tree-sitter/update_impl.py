@@ -3,6 +3,7 @@ import json
 import subprocess as sub
 import os
 import sys
+import tempfile
 from typing import Iterator, Any, Literal, TypedDict, Optional
 from tempfile import NamedTemporaryFile
 
@@ -19,6 +20,34 @@ Args = Iterator[str]
 
 def log(msg: str) -> None:
     print(msg, file=sys.stderr)
+
+
+def copy_grammar_to_tmpdir(path: str, tmpdirname: str):
+    yield "cp"
+    yield "--no-preserve=mode,ownership"
+    yield "-r"
+    yield f"{path}/."
+    yield tmpdirname
+
+
+def check_grammar(data) -> bool:
+    path = data["path"]
+
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        # Copy grammar to a temporary directory
+        run_cmd(copy_grammar_to_tmpdir(path, tmpdirname))
+
+        # Run the tree-sitter test command
+        res = sub.run(
+            "cd {tmpdirname} ; {tree_sitter_bin} test".format(
+                tmpdirname=tmpdirname, tree_sitter_bin=bins["tree-sitter"]
+            ),
+            stdout=sub.PIPE,
+            shell=True,
+        )
+
+        # Return True if the command succeeded, False otherwise
+        return res.returncode == 0
 
 
 def atomically_write(file_path: str, content: bytes) -> None:
@@ -125,12 +154,19 @@ def fetchRepo() -> None:
                     version_rev=release
                 )
             )
+
+            # Load the data since we need the grammar path to execute the tests
+            data = json.loads(res)
+
+            # Test the grammar with Tree-sitter and set the isBroken flag accordingly
+            data['isBroken'] = not check_grammar(data)
+
             atomically_write(
                 file_path=os.path.join(
                     outputDir,
                     f"{nixRepoAttrName}.json"
                 ),
-                content=res
+                content=json.dumps(data, indent=2).encode()
             )
         case _:
             sys.exit("input json must have `orga` and `repo` keys")
