@@ -92,7 +92,8 @@ let
     "go-tree-sitter"
     # kotlin bindings to the Tree-sitter parsing library
     "kotlin-tree-sitter"
-
+    # zig bindings to the Tree-sitter parsing library
+    "zig-tree-sitter"
     # Non-grammar repositories
     ".github"
     "fuzz-action"
