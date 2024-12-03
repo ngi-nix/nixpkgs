@@ -115,4 +115,3 @@
   tree-sitter-yang = lib.importJSON ./tree-sitter-yang.json;
   tree-sitter-zig = lib.importJSON ./tree-sitter-zig.json;
 }
-
