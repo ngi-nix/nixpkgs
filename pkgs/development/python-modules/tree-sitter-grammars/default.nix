@@ -4,6 +4,7 @@
 , tree-sitter
 , symlinkJoin
 , writeTextDir
+, pythonOlder
   # `name`: grammar derivation pname in the format of `tree-sitter-<lang>`
 , name
 , grammarDrv
@@ -83,6 +84,8 @@ buildPythonPackage {
                   ["-std=c11"] if system() != 'Windows' else []
                 ),
                 define_macros=[
+                  # Define python limited API for compatibility.
+                  # https://docs.python.org/3/c-api/stable.html#c.Py_LIMITED_API
                   ("Py_LIMITED_API", "0x03080000"),
                   ("PY_SSIZE_T_CLEAN", None)
                 ],
@@ -113,6 +116,8 @@ buildPythonPackage {
   preCheck = ''
     rm -r ${snakeCaseName}
   '';
+
+  disabled = pythonOlder "3.8";
 
   nativeCheckInputs = [ tree-sitter pytestCheckHook ];
   pythonImportsCheck = [ snakeCaseName ];
