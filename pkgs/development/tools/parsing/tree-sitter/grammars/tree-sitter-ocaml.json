@@ -8,6 +8,5 @@
   "fetchLFS": false,
   "fetchSubmodules": false,
   "deepClone": false,
-  "leaveDotGit": false,
-  "isBroken": false
+  "leaveDotGit": false
 }
