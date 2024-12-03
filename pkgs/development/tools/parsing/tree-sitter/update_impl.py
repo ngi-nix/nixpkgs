@@ -59,6 +59,8 @@ def atomically_write(file_path: str, content: bytes) -> None:
     ) as tmp:
         try:
             tmp.write(content)
+            # Add a final line to pass the editorconfig-checker
+            tmp.write("\n".encode())
             os.rename(
                 src=tmp.name,
                 dst=file_path
@@ -158,8 +160,9 @@ def fetchRepo() -> None:
             # Load the data since we need the grammar path to execute the tests
             data = json.loads(res)
 
-            # Test the grammar with Tree-sitter and set the isBroken flag accordingly
-            data['isBroken'] = not check_grammar(data)
+            if not check_grammar(data):
+                # Test the grammar with Tree-sitter and set the isBroken flag accordingly
+                data['isBroken'] = not check_grammar(data)
 
             atomically_write(
                 file_path=os.path.join(
