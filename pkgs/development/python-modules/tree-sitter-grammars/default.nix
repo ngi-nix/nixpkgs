@@ -14,6 +14,9 @@ let
 
   snakeCaseName = lib.replaceStrings [ "-" ] [ "_" ] name;
   drvPrefix = "python-${name}";
+  # If the name of the grammar attribute differs from the grammar's symbol name,
+  # it could cause a symbol mismatch at load time. This override ensures the binding can
+  # find the correct symbol
   langIdentOverrides = {
     tree_sitter_org_nvim = "tree_sitter_org";
   };
