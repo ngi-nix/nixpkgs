@@ -1,13 +1,14 @@
-{ lib
-, buildPythonPackage
-, pytestCheckHook
-, tree-sitter
-, symlinkJoin
-, writeTextDir
-, pythonOlder
+{
+  lib,
+  buildPythonPackage,
+  pytestCheckHook,
+  tree-sitter,
+  symlinkJoin,
+  writeTextDir,
+  pythonOlder,
   # `name`: grammar derivation pname in the format of `tree-sitter-<lang>`
-, name
-, grammarDrv
+  name,
+  grammarDrv,
 }:
 let
   inherit (grammarDrv) version;
@@ -29,119 +30,109 @@ buildPythonPackage {
   src = symlinkJoin {
     name = "${drvPrefix}-source";
     paths = [
-      (writeTextDir "${snakeCaseName}/__init__.py"
-        ''
-          from ._binding import language
+      (writeTextDir "${snakeCaseName}/__init__.py" ''
+        from ._binding import language
 
-          __all__ = ["language"]
-        ''
-      )
-      (writeTextDir "${snakeCaseName}/binding.c"
-        ''
-          #include <Python.h>
+        __all__ = ["language"]
+      '')
+      (writeTextDir "${snakeCaseName}/binding.c" ''
+        #include <Python.h>
 
-          typedef struct TSLanguage TSLanguage;
+        typedef struct TSLanguage TSLanguage;
 
-          TSLanguage *${langIdent}(void);
+        TSLanguage *${langIdent}(void);
 
-          static PyObject* _binding_language(PyObject *self, PyObject *args) {
-              return PyLong_FromVoidPtr(${langIdent}());
-          }
+        static PyObject* _binding_language(PyObject *self, PyObject *args) {
+            return PyLong_FromVoidPtr(${langIdent}());
+        }
 
-          static PyMethodDef methods[] = {
-              {"language", _binding_language, METH_NOARGS,
-              "Get the tree-sitter language for this grammar."},
-              {NULL, NULL, 0, NULL}
-          };
+        static PyMethodDef methods[] = {
+            {"language", _binding_language, METH_NOARGS,
+            "Get the tree-sitter language for this grammar."},
+            {NULL, NULL, 0, NULL}
+        };
 
-          static struct PyModuleDef module = {
-              .m_base = PyModuleDef_HEAD_INIT,
-              .m_name = "_binding",
-              .m_doc = NULL,
-              .m_size = -1,
-              .m_methods = methods
-          };
+        static struct PyModuleDef module = {
+            .m_base = PyModuleDef_HEAD_INIT,
+            .m_name = "_binding",
+            .m_doc = NULL,
+            .m_size = -1,
+            .m_methods = methods
+        };
 
-          PyMODINIT_FUNC PyInit__binding(void) {
-              return PyModule_Create(&module);
-          }
-        ''
-      )
-      (writeTextDir "setup.py"
-        ''
-          from platform import system
-          from setuptools import Extension, setup
+        PyMODINIT_FUNC PyInit__binding(void) {
+            return PyModule_Create(&module);
+        }
+      '')
+      (writeTextDir "setup.py" ''
+        from platform import system
+        from setuptools import Extension, setup
 
 
-          setup(
-            packages=["${snakeCaseName}"],
-            ext_package="${snakeCaseName}",
-            ext_modules=[
-              Extension(
-                name="_binding",
-                sources=["${snakeCaseName}/binding.c"],
-                extra_objects = ["${grammarDrv}/parser"],
-                extra_compile_args=(
-                  ["-std=c11"] if system() != 'Windows' else []
-                ),
-                define_macros=[
-                  # Define python limited API for compatibility.
-                  # https://docs.python.org/3/c-api/stable.html#c.Py_LIMITED_API
-                  ("Py_LIMITED_API", "0x03080000"),
-                  ("PY_SSIZE_T_CLEAN", None)
-                ],
-                py_limited_api=True,
-              )
-            ],
-          )
-        ''
-      )
-      (writeTextDir "pyproject.toml"
-        ''
-          [build-system]
-          requires = ["setuptools>=42", "wheel"]
-          build-backend = "setuptools.build_meta"
+        setup(
+          packages=["${snakeCaseName}"],
+          ext_package="${snakeCaseName}",
+          ext_modules=[
+            Extension(
+              name="_binding",
+              sources=["${snakeCaseName}/binding.c"],
+              extra_objects = ["${grammarDrv}/parser"],
+              extra_compile_args=(
+                ["-std=c11"] if system() != 'Windows' else []
+              ),
+              define_macros=[
+                # Define python limited API for compatibility.
+                # https://docs.python.org/3/c-api/stable.html#c.Py_LIMITED_API
+                ("Py_LIMITED_API", "0x03080000"),
+                ("PY_SSIZE_T_CLEAN", None)
+              ],
+              py_limited_api=True,
+            )
+          ],
+        )
+      '')
+      (writeTextDir "pyproject.toml" ''
+        [build-system]
+        requires = ["setuptools>=42", "wheel"]
+        build-backend = "setuptools.build_meta"
 
-          [project]
-          name="${snakeCaseName}"
-          description = "${langIdent} grammar for tree-sitter"
-          version = "${version}"
-          keywords = ["parsing", "incremental", "python"]
-          classifiers = [
-            "Development Status :: 4 - Beta",
-            "Intended Audience :: Developers",
-            "License :: OSI Approved :: MIT License",
-            "Topic :: Software Development :: Compilers",
-            "Topic :: Text Processing :: Linguistic",
-          ]
+        [project]
+        name="${snakeCaseName}"
+        description = "${langIdent} grammar for tree-sitter"
+        version = "${version}"
+        keywords = ["parsing", "incremental", "python"]
+        classifiers = [
+          "Development Status :: 4 - Beta",
+          "Intended Audience :: Developers",
+          "License :: OSI Approved :: MIT License",
+          "Topic :: Software Development :: Compilers",
+          "Topic :: Text Processing :: Linguistic",
+        ]
 
-          requires-python = ">=3.8"
-          license.text = "MIT"
-          readme = "README.md"
+        requires-python = ">=3.8"
+        license.text = "MIT"
+        readme = "README.md"
 
-          [project.optional-dependencies]
-          core = ["tree-sitter~=0.21"]
+        [project.optional-dependencies]
+        core = ["tree-sitter~=0.21"]
 
-          [tool.cibuildwheel]
-          build = "cp38-*"
-          build-frontend = "build"
-        ''
-      )
-      (writeTextDir "tests/test_language.py"
-        ''
-          from ${snakeCaseName} import language
-          from tree_sitter import Language, Parser
+        [tool.cibuildwheel]
+        build = "cp38-*"
+        build-frontend = "build"
+      '')
+      (writeTextDir "tests/test_language.py" ''
+        from ${snakeCaseName} import language
+        from tree_sitter import Language, Parser
 
 
-          def test_language():
-            lang = Language(language())
-            assert lang is not None
-            parser = Parser()
-            parser.language = lang
-            tree = parser.parse(bytes("", "utf-8"))
-            assert tree is not None
-        ''
-      )
+        def test_language():
+          lang = Language(language())
+          assert lang is not None
+          parser = Parser()
+          parser.language = lang
+          tree = parser.parse(bytes("", "utf-8"))
+          assert tree is not None
+      '')
     ];
   };
 
@@ -152,12 +143,20 @@ buildPythonPackage {
 
   disabled = pythonOlder "3.8";
 
-  nativeCheckInputs = [ tree-sitter pytestCheckHook ];
+  nativeCheckInputs = [
+    tree-sitter
+    pytestCheckHook
+  ];
   pythonImportsCheck = [ snakeCaseName ];
 
   meta = {
     description = "Python bindings for ${name}";
     license = lib.licenses.mit;
-    maintainers = with lib.maintainers; [ a-jay98 adfaure mightyiam stepbrobd ];
+    maintainers = with lib.maintainers; [
+      a-jay98
+      adfaure
+      mightyiam
+      stepbrobd
+    ];
   };
 }
