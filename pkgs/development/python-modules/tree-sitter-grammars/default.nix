@@ -74,8 +74,6 @@ buildPythonPackage {
 
 
           setup(
-            name="${snakeCaseName}",
-            version="${version}",
             packages=["${snakeCaseName}"],
             ext_package="${snakeCaseName}",
             ext_modules=[
@@ -96,6 +94,37 @@ buildPythonPackage {
               )
             ],
           )
+        ''
+      )
+      (writeTextDir "pyproject.toml"
+        ''
+          [build-system]
+          requires = ["setuptools>=42", "wheel"]
+          build-backend = "setuptools.build_meta"
+
+          [project]
+          name="${snakeCaseName}"
+          description = "${langIdent} grammar for tree-sitter"
+          version = "${version}"
+          keywords = ["parsing", "incremental", "python"]
+          classifiers = [
+            "Development Status :: 4 - Beta",
+            "Intended Audience :: Developers",
+            "License :: OSI Approved :: MIT License",
+            "Topic :: Software Development :: Compilers",
+            "Topic :: Text Processing :: Linguistic",
+          ]
+
+          requires-python = ">=3.8"
+          license.text = "MIT"
+          readme = "README.md"
+
+          [project.optional-dependencies]
+          core = ["tree-sitter~=0.21"]
+
+          [tool.cibuildwheel]
+          build = "cp38-*"
+          build-frontend = "build"
         ''
       )
       (writeTextDir "tests/test_language.py"
