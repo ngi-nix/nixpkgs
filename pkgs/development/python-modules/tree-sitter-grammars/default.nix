@@ -124,6 +124,9 @@ buildPythonPackage {
         from ${snakeCaseName} import language
         from tree_sitter import Language, Parser
 
+        # This test only checks that the binding can load the grammar from the compiled shared object.
+        # It does not verify the grammar itself; that is tested in
+        # `pkgs/development/tools/parsing/tree-sitter/grammar.nix`.
 
         def test_language():
           lang = Language(language())
