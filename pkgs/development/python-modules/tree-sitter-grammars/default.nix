@@ -93,7 +93,7 @@ buildPythonPackage {
       '')
       (writeTextDir "pyproject.toml" ''
         [build-system]
-        requires = ["setuptools>=42", "wheel"]
+        requires = ["setuptools", "wheel"]
         build-backend = "setuptools.build_meta"
 
         [project]
