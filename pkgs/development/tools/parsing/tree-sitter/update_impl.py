@@ -15,19 +15,11 @@ bins: dict[str, Bin] = args["binaries"]
 mode: str = sys.argv[1]
 jsonArg: dict = json.loads(sys.argv[2])
 
-Args = Iterator[str]
+Args = Iterator[str] | [str]
 
 
 def log(msg: str) -> None:
     print(msg, file=sys.stderr)
-
-
-def copy_grammar_to_tmpdir(path: str, tmpdirname: str):
-    yield "cp"
-    yield "--no-preserve=mode,ownership"
-    yield "-r"
-    yield f"{path}/."
-    yield tmpdirname
 
 
 def check_grammar(data) -> bool:
@@ -35,19 +27,17 @@ def check_grammar(data) -> bool:
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         # Copy grammar to a temporary directory
-        run_cmd(copy_grammar_to_tmpdir(path, tmpdirname))
+        run_cmd(["cp", "--no-preserve=mode,ownership", "-r", f"{path}/.", tmpdirname])
 
         # Run the tree-sitter test command
-        res = sub.run(
-            "cd {tmpdirname} ; {tree_sitter_bin} test".format(
-                tmpdirname=tmpdirname, tree_sitter_bin=bins["tree-sitter"]
-            ),
+        test_result = sub.run(
+            [bins["tree-sitter"], "test"],
             stdout=sub.PIPE,
-            shell=True,
+            cwd=tmpdirname
         )
 
         # Return True if the command succeeded, False otherwise
-        return res.returncode == 0
+        return test_result.returncode == 0
 
 
 def atomically_write(file_path: str, content: bytes) -> None:
