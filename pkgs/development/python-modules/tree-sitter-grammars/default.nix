@@ -80,13 +80,6 @@ buildPythonPackage {
               extra_compile_args=(
                 ["-std=c11"] if system() != 'Windows' else []
               ),
-              define_macros=[
-                # Define python limited API for compatibility.
-                # https://docs.python.org/3/c-api/stable.html#c.Py_LIMITED_API
-                ("Py_LIMITED_API", "0x03080000"),
-                ("PY_SSIZE_T_CLEAN", None)
-              ],
-              py_limited_api=True,
             )
           ],
         )
